@@ -1,12 +1,10 @@
 package com.ceej.model;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +17,12 @@ class ArticleTest {
     @BeforeEach
     public void init(){
         article = new Article();
+        Locale.setDefault(Locale.US);
+    }
+    @AfterEach
+    public void teardown(){
+        article = new Article();
+        Locale.setDefault(Locale.getDefault());
     }
 
     @Test
