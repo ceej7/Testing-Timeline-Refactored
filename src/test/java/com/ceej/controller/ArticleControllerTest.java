@@ -45,7 +45,6 @@ class ArticleControllerTest {
 
 
         mockMvc = MockMvcBuilders.standaloneSetup(new ArticleController(mock_dbUtil, mock_fileOp)).build();
-//        articleController = new ArticleController(mock_dbUtil, mock_fileOp);
     }
 
     // testing for publishAnArticle
