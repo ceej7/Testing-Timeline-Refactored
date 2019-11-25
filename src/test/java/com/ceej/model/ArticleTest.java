@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // refactoring: data testing not hardcoded
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ArticleTest {
     Article article;
 
@@ -25,6 +26,7 @@ class ArticleTest {
         Locale.setDefault(Locale.getDefault());
     }
 
+    @Order(1)
     @Test
     @DisplayName("设置时间为now")
     public void set_article_to_now(){
@@ -34,6 +36,7 @@ class ArticleTest {
         assertEquals("刚刚", article.getTimeStamp());
     }
 
+    @Order(2)
     @Test
     @DisplayName("设置时间为5分钟前")
     public void set_article_to_five_min_before(){
@@ -43,6 +46,7 @@ class ArticleTest {
         assertEquals("5分钟前", article.getTimeStamp());
     }
 
+    @Order(3)
     @Test
     @DisplayName("设置时间为5小时前")
     public void set_article_to_five_hours_before(){
@@ -52,6 +56,7 @@ class ArticleTest {
         assertEquals("5小时前", article.getTimeStamp());
     }
 
+    @Order(4)
     @Test
     @DisplayName("设置时间为一天前")
     public void set_article_to_one_day_before(){
@@ -61,6 +66,7 @@ class ArticleTest {
         assertEquals("昨天 "+bf.format(DateTimeFormatter.ofPattern("HH:mm")).toString(), article.getTimeStamp());
     }
 
+    @Order(5)
     @Test
     @DisplayName("设置时间为一个月前")
     public void set_article_to_one_month_before(){
@@ -70,6 +76,7 @@ class ArticleTest {
         assertEquals(bf.format(DateTimeFormatter.ofPattern("MM月dd日HH时")).toString(), article.getTimeStamp());
     }
 
+    @Order(6)
     @Test
     @DisplayName("设置时间为一年前")
     public void set_article_to_one_year_before(){
