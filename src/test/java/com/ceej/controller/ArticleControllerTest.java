@@ -4,6 +4,7 @@ import com.ceej.model.Article;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -22,8 +23,7 @@ import java.util.List;
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -33,18 +33,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ArticleControllerTest {
     DataBaseUtility mock_dbUtil;
     FileOperator mock_fileOp;
-    ArticleController articleController;
-
     private MockMvc mockMvc;
-
+    ArticleController articleController;
 
     @BeforeEach
     public void mocksetup(){
         mock_dbUtil = mock(DataBaseUtility.class);
         mock_fileOp = mock(FileOperator.class);
-
-
-        mockMvc = MockMvcBuilders.standaloneSetup(new ArticleController(mock_dbUtil, mock_fileOp)).build();
+        articleController = new ArticleController(mock_dbUtil, mock_fileOp);
+        mockMvc = MockMvcBuilders.standaloneSetup(articleController).build();
     }
 
     // testing for publishAnArticle
@@ -66,9 +63,9 @@ class ArticleControllerTest {
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         // TODO: 将Response中的Body提取成Json并且在下方嵌入判断
         assertEquals("404", code);
+        verify(mock_dbUtil,times(0)).addArticle(anyString(),anyString(),anyString());
     }
     @Test
-    @Disabled
     @DisplayName("publishAnArticle: content不能为空")
     public void publishAnArticle_content_should_not_be_null() throws Exception {
         when(mock_dbUtil.isUserExisted(null)).thenReturn(false);
@@ -84,9 +81,9 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("404", code);
+        verify(mock_dbUtil,times(0)).addArticle(anyString(),anyString(),anyString());
     }
     @Test
-    @Disabled
     @DisplayName("publishAnArticle: img可以为空")
     public void publishAnArticle_img_can_be_null() throws Exception {
         when(mock_dbUtil.isUserExisted("1")).thenReturn(true);
@@ -103,9 +100,9 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("205", code);
+        verify(mock_dbUtil,times(1)).addArticle(anyString(),anyString(),anyString());
     }
     @Test
-    @Disabled
     @DisplayName("publishAnArticle: imgData不能被解析生成imgUrl")
     public void publishAnArticle_imgData_cannot_be_decoded() throws Exception {
         when(mock_dbUtil.isUserExisted("1")).thenReturn(true);
@@ -123,9 +120,9 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("404", code);
+        verify(mock_dbUtil,times(0)).addArticle(anyString(),anyString(),anyString());
     }
     @Test
-    @Disabled
     @DisplayName("publishAnArticle: imgData能被解析生成imgUrl")
     public void publishAnArticle_imgData_can_be_decoded() throws Exception {
         when(mock_dbUtil.isUserExisted("1")).thenReturn(true);
@@ -143,9 +140,9 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("205", code);
+        verify(mock_dbUtil,times(1)).addArticle(anyString(),anyString(),anyString());
     }
     @Test
-    @Disabled
     @DisplayName("publishAnArticle: 发布的userid存在")
     public void publishAnArticle_with_existed_user() throws Exception {
         when(mock_dbUtil.isUserExisted("1")).thenReturn(true);
@@ -161,10 +158,10 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("205", code);
+        verify(mock_dbUtil,times(1)).addArticle(anyString(),anyString(),anyString());
     }
 
     @Test
-    @Disabled
     @DisplayName("publishAnArticle: 发布的userid不存在")
     public void publishAnArticle_with_none_existed_user() throws Exception {
         when(mock_dbUtil.isUserExisted("1")).thenReturn(false);
@@ -180,11 +177,11 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("404", code);
+        verify(mock_dbUtil,times(0)).addArticle(anyString(),anyString(),anyString());
     }
 
     //testing for deleteAnArticle
     @Test
-    @Disabled
     @DisplayName("deleteAnArticle: ID不能为空")
     public void deleteAnArticle_Id_should_not_be_null() throws Exception {
         when(mock_dbUtil.isArticleExisted(null)).thenReturn(false);
@@ -196,9 +193,9 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("404", code);
+        verify(mock_dbUtil,times(0)).deleteArticle(anyString());
     }
     @Test
-    @Disabled
     @DisplayName("deleteAnArticle: 待删除的article存在")
     public void deleteAnArticle_with_existed_article() throws Exception {
         when(mock_dbUtil.isArticleExisted("1")).thenReturn(true);
@@ -213,9 +210,9 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("205", code);
+        verify(mock_dbUtil,times(1)).deleteArticle(anyString());
     }
     @Test
-    @Disabled
     @DisplayName("deleteAnArticle: 待删除的article不存在")
     public void deleteAnArticle_with_none_existed_article() throws Exception {
         when(mock_dbUtil.isArticleExisted("1")).thenReturn(false);
@@ -230,11 +227,11 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         String code = JsonPath.read(result.getResponse().getContentAsString(),"$.code");
         assertEquals("404", code);
+        verify(mock_dbUtil,times(0)).deleteArticle(anyString());
     }
 
     //testing retrieveNewestArticles
     @Test
-    @Disabled
     public void retrieveNewestArticles_query_articles_failed_return_num_0() throws Exception {
         when(mock_dbUtil.getCurrentArticles(anyInt(), anyInt())).thenReturn(null);
         String jsonBase = "{\n" +
@@ -248,9 +245,9 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         List<Article> data = JsonPath.read(result.getResponse().getContentAsString(),"$.data");
         assertEquals(0, data.size());
+        verify(mock_dbUtil,times(1)).getCurrentArticles(anyInt(),anyInt());
     }
     @Test
-    @Disabled
     public void retrieveNewestArticles_return_correct_number_of_article_which_id_greater_than_front() throws Exception {
         Article a1=new Article(),a2=new Article(),a3=new Article(),a4=new Article(),a5=new Article();
         a1.setArticleID("1");
@@ -278,9 +275,9 @@ class ArticleControllerTest {
                 ()->{assertEquals("5",data.get(0).get("articleID"));},
                 ()->{assertEquals("4",data.get(1).get("articleID"));}
                 );
+        verify(mock_dbUtil,times(1)).getCurrentArticles(anyInt(),anyInt());
     }
     @Test
-    @Disabled
     public void retrieveNewestArticles_return_correct_number_of_article_which_maximum_equals_to_num() throws Exception {
         Article a1=new Article(),a2=new Article(),a3=new Article(),a4=new Article(),a5=new Article();
         a1.setArticleID("1");
@@ -306,6 +303,7 @@ class ArticleControllerTest {
                 ()->{assertEquals("5",data.get(0).get("articleID"));},
                 ()->{assertEquals("4",data.get(1).get("articleID"));}
         );
+        verify(mock_dbUtil,times(1)).getCurrentArticles(anyInt(),anyInt());
     }
 
     //testing retrievePreviousArticles
@@ -323,6 +321,7 @@ class ArticleControllerTest {
                 mockMvc.perform(requestBuilder).andReturn();
         ArrayList<HashMap> data = JsonPath.read(result.getResponse().getContentAsString(),"$.data");
         assertEquals(0, data.size());
+        verify(mock_dbUtil,times(1)).getPreviousArticles(anyInt(),anyInt());
     }
     @Test
     public void retrievePreviousArticles_return_correct_number_of_article_which_id_greater_than_front() throws Exception {
@@ -350,6 +349,7 @@ class ArticleControllerTest {
                 ()->{assertEquals("2",data.get(0).get("articleID"));},
                 ()->{assertEquals("1",data.get(1).get("articleID"));}
         );
+        verify(mock_dbUtil,times(1)).getPreviousArticles(anyInt(),anyInt());
     }
     @Test
     public void retrievePreviousArticles_return_correct_number_of_article_which_maximum_equals_to_num() throws Exception {
@@ -377,5 +377,6 @@ class ArticleControllerTest {
                 ()->{assertEquals("4",data.get(0).get("articleID"));},
                 ()->{assertEquals("3",data.get(1).get("articleID"));}
         );
+        verify(mock_dbUtil,times(1)).getPreviousArticles(anyInt(),anyInt());
     }
 }
