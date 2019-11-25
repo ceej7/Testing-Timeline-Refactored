@@ -260,16 +260,7 @@ class DataBaseUtilityTest {
 
         assertEquals("1", stringArgumentCaptor.getAllValues().get(0));
         assertEquals("1", stringArgumentCaptor.getAllValues().get(1));
-
-        /*
-        * org.mockito.exceptions.verification.TooManyActualInvocations:
-preparedStatement.close();
-Wanted 1 time:
--> at com.ceej.controller.DataBaseUtilityTest.get_image_url_of_article(DataBaseUtilityTest.java:242)
-But was 2 times:
--> at com.ceej.controller.DataBaseUtility.closeConnection(DataBaseUtility.java:32)
--> at com.ceej.controller.DataBaseUtility.closeConnection(DataBaseUtility.java:32)
-        * */
+        
         verify(statement,times(2)).close();
         verify(connection,times(2)).close();
     }
